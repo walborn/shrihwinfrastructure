@@ -1,6 +1,9 @@
 #!/bin/bash
 # OAuth и OrgId берутся из переменных окружения
 
+OAuth=$(grep OAuth .env.local | cut -d '=' -f2)
+OrgId=$(grep OrgId .env.local | cut -d '=' -f2)
+
 issues="https://api.tracker.yandex.net/v2/issues/"
 
 headerAuth="Authorization: OAuth $OAuth"
@@ -32,7 +35,7 @@ created=$(curl --silent --location --request POST ${issues} \
 }')
 
 status=$(echo "$created" | jq -r '.statusCode')
-echo $status
+echo $created
 
 if [ $status = 201 ]; then
   echo "Release created successfully"

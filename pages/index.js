@@ -1,4 +1,5 @@
 import React from 'react'
+import Head from 'next/head'
 
 function IndexPage() {
   const [ result, setResult ] = React.useState({})
@@ -15,6 +16,11 @@ function IndexPage() {
   }
     
   return <>
+    <Head>
+      <title>Create Next App</title>
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
+
     <button onClick={handleClick}>Request</button>
     <pre>{JSON.stringify(result, null, 2)}</pre>
   </>

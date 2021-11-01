@@ -1,5 +1,7 @@
 #!/bin/bash
 # OAuth и OrgId берутся из переменных окружения
+OAuth=$(grep OAuth .env.local | cut -d '=' -f2)
+OrgId=$(grep OrgId .env.local | cut -d '=' -f2)
 
 issues="https://api.tracker.yandex.net/v2/issues/"
 
@@ -20,10 +22,11 @@ taskId=$(curl --silent --location --request POST ${issues}_search \
       }
     }' | jq -r '.[0].key')
 
-validation=$(yarn test | grep -o 'failing')
+# todo - понять как проверять успешность тестов
+validation=$(yarn test | tr -s "")
+
 
 comment="Tests:\n $validation"
-echo $comment
 
 commented=$(curl --location --request POST ${issues}${taskId}/comments \
   --header "$headerOrgId" \
@@ -34,9 +37,7 @@ commented=$(curl --location --request POST ${issues}${taskId}/comments \
   }')
 
 
-echo $commented
 status=$(echo "$commented" | jq -r '.statusCode')
-echo $status
 echo "Created new comment: $commented"
 
 if [ $status = 201 ]; then
