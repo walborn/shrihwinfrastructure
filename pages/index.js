@@ -1,6 +1,6 @@
 import React from 'react'
 
-function HomePage() {
+function IndexPage() {
   const [ result, setResult ] = React.useState({})
   const handleClick = () => {
   fetch('https://api.tracker.yandex.net/v2/myself', {
@@ -11,13 +11,13 @@ function HomePage() {
     },
   })
     .then(res => res.json())
-    .then(console.log)
+    .then(setResult)
   }
     
   return <>
-  <button onClick={handleClick}>Request</button>
-  <pre>{JSON.stringify(result, null, 2)}</pre>
+    <button onClick={handleClick}>Request</button>
+    <pre>{JSON.stringify(result, null, 2)}</pre>
   </>
 }
 
-export default HomePage
+export default IndexPage
