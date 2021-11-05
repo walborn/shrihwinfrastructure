@@ -1,0 +1,22 @@
+name: Yandex.Tracker release ✈️
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v\d+\.\d+.\d+'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 🚚 Run release scripts
+        run: |
+          sh ./.github/workflows/scripts/release.sh
+          echo
+          echo
+          echo "DONE! 🎉"
