@@ -16,7 +16,7 @@ jobs:
         run: sudo apt-get install -y jq
 
       - name: 🎟️ Create ticket
-        run: sh ./github/workflows/scripts/release.sh
+        run: sh ./.github/workflows/scripts/release.sh
         env:
           OAuth: ${{ secrets.OAuth }}
           OrgId: ${{ secrets.OrgId }}
@@ -25,7 +25,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: 🧪 Run tests
-        run: sh ./github/workflows/scripts/test.sh
+        run: sh ./.github/workflows/scripts/test.sh
         env:
           OAuth: ${{ secrets.OAuth }}
           OrganizationId: ${{ secrets.OrgId }}
