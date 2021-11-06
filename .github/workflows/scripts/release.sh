@@ -1,44 +1,79 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# OAuth and OrgId are taken from environment variables
 
-export CURRENT_TAG_NAME=$(git tag --sort version:refname | tail -1 | head -n1)
-PREVIOUS_TAG_NAME=$(git tag --sort version:refname | tail -2 | head -n1)
-export CURRENT_TAG_AUTHOR_NAME=$(git show "$CURRENT_TAG_NAME" --pretty=format:"%an" --no-patch)
-export CURRENT_TAG_AUTHOR_DATE=$(git show "$CURRENT_TAG_NAME" --pretty=format:"%ar" --no-patch)
-CHANGELOG=$(git log "$PREVIOUS_TAG_NAME".. --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" " ")
+issues="https://api.tracker.yandex.net/v2/issues/"
 
-export YT_HOST="https://api.tracker.yandex.net"
-export YT_TOKEN="AQAAAAAHBiYUAAd4sTc6OsldZEfwpY6Hfuu6ZvE"
-export YT_ORG_ID="6461097"
-export YT_QUEUE="TMP"
-export YT_UNIQUE_PREFIX="viktor-ulyankin"
+headerAuth="Authorization: OAuth $OAuth"
+headerOrgId="X-Org-Id: $OrgId"
+headerContentType="Content-Type: application/json"
 
-export REQUEST_DATA_TASK='{
-  "queue": "'$YT_QUEUE'",
-  "summary": "CHANGELOG. Release '"$CURRENT_TAG_NAME"' ('"$CURRENT_TAG_AUTHOR_NAME"', '"$CURRENT_TAG_AUTHOR_DATE"')",
-  "description": "'"$CHANGELOG"'",
-  "unique": "'"$YT_UNIQUE_PREFIX"'_'"$CURRENT_TAG_NAME"'"
-}'
+# detect current release tag number
+tag=$(git describe --tags --abbrev=0)
 
-# Добавление/обновление задачи в Яндекс Трекер
-chmod +x ./.github/workflows/sh/api/task/add.sh
-./.github/workflows/sh/api/task/add.sh
+author=$(git show $tag  --pretty=format:"Author: %an" --date=format:'%Y-%m-%d %H:%M:%S' --no-patch)
+date=$(git show ${tag} | grep Date:)
 
-if [ $? != 0 ]; then
-  exit $?
-fi
+# write changelog by commit history, from previous release tag till current
+prev=$(git describe --tags --abbrev=0 $tag^)
+commits=$(git log $prev..$tag --pretty=format:"%h - %s (%an, %ar)" | tr -s "")
+echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
-# Запуск тестов
-chmod +x ./.github/workflows/sh/test.sh
-./.github/workflows/sh/test.sh
+created=$(curl --silent --location --request POST ${issues} \
+--header "$headerOrgId" \
+--header "$headerAuth" \
+--header "$headerContentType" \
+--data-raw '{
+  "queue": "INFRASTRUCTURE",
+  "summary": "'"$tag"'",
+  "type": "release",
+  "assignee": "codebor",
+  "description": "'"$commits"'",
+  "unique": "'"$tag"'"
+}')
 
-if [ $? != 0 ]; then
-  exit $?
-fi
+status=$(echo "$created" | jq -r '.statusCode')
+echo $created
 
-# Создание артефакта (Docker)
-chmod +x ./.github/workflows/sh/artifact.sh
-./.github/workflows/sh/artifact.sh
+if [ $status = 201 ]; then
+  echo "Release created successfully"
+elif [ $status = 404 ]; then
+  echo "Not found"
+elif [ $status = 409 ]; then
+  echo "Cannot create task with the same release version"
+  echo "Adding new comment then"
 
-if [ $? != 0 ]; then
-  exit $?
+  taskId=$(curl --silent --location --request POST ${issues}_search \
+    --header "$headerOrgId" \
+    --header "$headerAuth" \
+    --header "$headerContentType" \
+    --data-raw '{
+        "filter": {
+          "unique": "'"${tag}"'"
+        }
+      }' | jq -r '.[0].key')
+
+
+  updated=$(curl -s -X PATCH ${issues}${taskId} \
+  --header "$headerOrgId" \
+  --header "$headerAuth" \
+  --header "$headerContentType" \
+  --data-raw '{
+      "summary": "'"$tag"'",
+      "type": "release",
+      "assignee": "codebor",
+      "description": "'"$commits"'"
+    }')
+
+  status=$(echo "$updated" | jq -r '.statusCode')
+  echo $updated
+
+  if [ $status = 200 ]; then
+    echo "Task updated"
+  elif [ $status = 404 ]; then
+    echo "Task not found"
+  elif [ $status = 422 ]; then
+    echo "Unable to process the contained instructions"
+  fi
+else
+  echo "ERROR: $updateTask"
 fi

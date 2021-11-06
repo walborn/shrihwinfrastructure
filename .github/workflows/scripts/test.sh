@@ -1,23 +1,42 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# OAuth and OrgId are taken from environment variables
 
-npm ci
-npm run build
-TEST_RESULT=$(npm run test 2>&1 | tail -n +3 | tr -s "\n" " ")
+issues="https://api.tracker.yandex.net/v2/issues/"
+
+headerAuth="Authorization: OAuth $OAuth"
+headerOrgId="X-Org-Id: $OrgId"
+headerContentType="Content-Type: application/json"
+
+tag=$(git describe --tags --abbrev=0)
+
+taskId=$(curl --silent --location --request POST ${issues}_search \
+  --header "$headerOrgId" \
+  --header "$headerAuth" \
+  --header "$headerContentType" \
+  --data-raw '{
+      "filter": {
+        "unique": "'"${tag}"'"
+      }
+    }' | jq -r '.[0].key')
 
 
-ADD_TEST_TASK_CODE_RESPONSE=$(
-  curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$YT_HOST"'/v2/issues/' \
-  --header 'Authorization: OAuth '"$YT_TOKEN" \
-  --header 'X-Org-ID: '"$YT_ORG_ID" \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "queue": "'"$YT_QUEUE"'",
-    "summary": "TEST. Release '"$CURRENT_TAG_NAME"' ('"$CURRENT_TAG_AUTHOR_NAME"', '"$CURRENT_TAG_AUTHOR_DATE"')",
-    "description": "'"$TEST_RESULT"'"
-  }'
-)
+validation=$(yarn test 2>&1 | tail -n +3 | tr -s "\n" " ")
 
-FIRST_CHAR_CODE_RESPONSE=$(echo "$ADD_TEST_TASK_CODE_RESPONSE" | cut -c 1)
+comment="Tests:\n $validation"
 
-[ "$FIRST_CHAR_CODE_RESPONSE" = "2" ]
-exit $?
+commented=$(curl --location --request POST ${issues}${taskId}/comments \
+  --header "$headerOrgId" \
+  --header "$headerAuth" \
+  --header "$headerContentType" \
+  --data-raw '{
+    "text": "'"${comment}"'"
+  }')
+
+status=$(echo "$commented" | jq -r '.statusCode')
+echo "Created comment: $commented"
+
+if [ $status = 201 ]; then
+  echo "Added comment: TEST RESULT"
+elif [ $status = 404 ]; then
+  echo "Cannot add comment, task is not found"
+fi

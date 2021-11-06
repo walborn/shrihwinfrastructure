@@ -1,22 +1,32 @@
-name: Yandex.Tracker release ✈️
+name: Yandex.Tracker - add release ✈️
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     tags:
-      - 'v\d+\.\d+.\d+'
+      - 'v*'
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
-      - name: 🚚 Run release scripts
-        run: |
-          sh ./.github/workflows/scripts/release.sh
-          echo
-          echo
-          echo "DONE! 🎉"
+      - name: 📦 Install jq
+        run: sudo apt-get install -y jq
+
+      - name: 🎟️ Create ticket
+        run: sh ./github/workflows/scripts/release.sh
+        env:
+          OAuth: ${{ secrets.OAuth }}
+          OrgId: ${{ secrets.OrgId }}
+
+      - name: 📦 Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: 🧪 Run tests
+        run: sh ./github/workflows/scripts/test.sh
+        env:
+          OAuth: ${{ secrets.OAuth }}
+          OrganizationId: ${{ secrets.OrgId }}
+        
