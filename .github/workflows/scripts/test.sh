@@ -15,7 +15,7 @@ taskId=$(curl --silent --location --request POST ${issues}_search \
   --header "$headerContentType" \
   --data-raw '{
       "filter": {
-        "unique": "'"${tag}"'"
+        "unique": "'"codebor/${tag}"'"
       }
     }' | jq -r '.[0].key')
 
@@ -23,17 +23,15 @@ taskId=$(curl --silent --location --request POST ${issues}_search \
 validation=$(yarn test 2>&1 | tail -n +3 | tr -s "\n" " ")
 
 comment="Tests:\n $validation"
-
 commented=$(curl --location --request POST ${issues}${taskId}/comments \
-  --header "$headerOrgId" \
-  --header "$headerAuth" \
-  --header "$headerContentType" \
-  --data-raw '{
-    "text": "'"${comment}"'"
-  }')
+--header "$headerAuth" \
+--header "$headerOrgId" \
+--header "$headerContentType" \
+--data-raw '{
+  "text": "'"$comment"'"
+}')
 
 status=$(echo "$commented" | jq -r '.statusCode')
-echo "Created comment: $commented"
 
 if [ $status = 201 ]; then
   echo "Added comment: TEST RESULT"
