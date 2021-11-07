@@ -6,7 +6,7 @@ function IndexPage() {
   const handleClick = () => {
   fetch('https://api.tracker.yandex.net/v2/myself', {
     headers: {
-      Authorization: 'OAuth AQAAAAA6-xOMAAd5NiluDTEGHEmRl6TfIdlzL2A',
+      Authorization: `OAuth ${process.env.OAuth}`,
       'X-Org-ID': '6610725',
       'Access-Control-Allow-Origin': '*'
     },
@@ -21,7 +21,7 @@ function IndexPage() {
       <link rel="icon" href="/favicon.ico" />
     </Head>
 
-    <button onClick={handleClick}>Request</button>
+    <button onClick={handleClick}>Myself</button>
     <pre>{JSON.stringify(result, null, 2)}</pre>
   </>
 }
