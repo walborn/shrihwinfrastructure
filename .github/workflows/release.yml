@@ -27,5 +27,5 @@ jobs:
         run: sh ./.github/workflows/scripts/test.sh
         env:
           OAuth: ${{ secrets.OAuth }}
-          OrganizationId: ${{ secrets.OrgId }}
+          OrgId: ${{ secrets.OrgId }}
         
