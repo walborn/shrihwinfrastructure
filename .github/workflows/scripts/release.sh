@@ -8,7 +8,7 @@ headerOrgId="X-Org-Id: $OrgId"
 headerContentType="Content-Type: application/json"
 
 # detect current release tag number
-tag=$(git tag | tail -1)
+tag=$(git tag | sort -r | head -n1)
 author=$(git show $tag  --pretty=format:"Author: %an" --date=format:'%Y-%m-%d %H:%M:%S' --no-patch)
 date=$(git show ${tag} | grep Date:)
 
@@ -20,7 +20,9 @@ echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 echo "description": "'"$commits"'"
 echo $prev
 echo $tag
-echo $(git tag | grep '^v\d*\.\d*\.\d*$')
+echo $(git tag | grep '^v\d*.\d*.\d*$')
+echo $(git tag | grep '^v')
+echo $(git tag | tail -3)
 
 
 # created=$(curl --silent --location --request POST ${issues} \
