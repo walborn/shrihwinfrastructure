@@ -11,7 +11,7 @@
      render(<IndexPage />)
  
      const button = screen.getByRole('button', {
-       name: /Request/i,
+       name: /myself/i,
      })
  
      expect(button).toBeInTheDocument()

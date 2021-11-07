@@ -2,9 +2,10 @@ name: Yandex.Tracker - add release ✈️
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:

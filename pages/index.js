@@ -21,7 +21,7 @@ function IndexPage() {
       <link rel="icon" href="/favicon.ico" />
     </Head>
 
-    <button onClick={handleClick}>Myself</button>
+    <button onClick={handleClick}>myself</button>
     <pre>{JSON.stringify(result, null, 2)}</pre>
   </>
 }
