@@ -18,6 +18,8 @@ prev=$(git describe --tags --abbrev=0 $tag^)
 commits=$(git log $prev..$tag --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" " ")
 echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
+echo "description": "'"$commits"'"
+
 created=$(curl --silent --location --request POST ${issues} \
 --header "$headerAuth" \
 --header "$headerOrgId" \
@@ -33,7 +35,6 @@ created=$(curl --silent --location --request POST ${issues} \
 
 status=$(echo "$created" | jq -r '.statusCode')
 
-echo $created
 if [ $status = 201 ]; then
   echo "Release created successfully"
 elif [ $status = 404 ]; then

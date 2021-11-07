@@ -1,3 +1,11 @@
+# v1.0.4
+763eb8e - v1.0.4 release (walborn, 6 hours ago)
+ a7e913b - fix: change queue in yandex tracker (walborn, 6 hours ago)
+
+# v1.0.4
+763eb8e - v1.0.4 release (walborn, 6 hours ago)
+ a7e913b - fix: change queue in yandex tracker (walborn, 6 hours ago)
+
 # v1.0.3
 d03d649 - github actions: test release by tag (walborn, 4 hours ago)
  dae95eb - test: fix index page (walborn, 4 hours ago)

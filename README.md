@@ -1,5 +1,8 @@
 # SHRI homework. Infrastructure
 
+Задачи создаются в очереди TMP
+https://tracker.yandex.ru/TMP/order:updated:false/filter?resolution=empty()&author=codebor
+
 ## Bash
 - chmod u+x release.sh
 - you need to install jq `brew install jq`
