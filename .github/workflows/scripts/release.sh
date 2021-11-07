@@ -8,16 +8,18 @@ headerOrgId="X-Org-Id: $OrgId"
 headerContentType="Content-Type: application/json"
 
 # detect current release tag number
-tag=$(git tag | tail -1)
+tag=$(git describe --tags --abbrev=0)
+
 author=$(git show $tag  --pretty=format:"Author: %an" --date=format:'%Y-%m-%d %H:%M:%S' --no-patch)
 date=$(git show ${tag} | grep Date:)
 
 # write changelog by commit history, from previous release tag till current
-prev=$(git tag | tail -2 | head -n1)
-commits=$(git log --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" "")
+prev=$(git describe --tags --abbrev=0 $tag^^)
+commits=$(git log $prev..$tag --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" " ")
 echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
-echo "commits:"
+echo $tag
+echo $prev
 echo $commits
 
 # created=$(curl --silent --location --request POST ${issues} \
