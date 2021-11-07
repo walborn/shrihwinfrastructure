@@ -19,6 +19,9 @@ commits=$(git log $prev..$tag --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n
 echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
 echo "description": "'"$commits"'"
+echo $prev
+echo $tag
+
 
 created=$(curl --silent --location --request POST ${issues} \
 --header "$headerAuth" \
