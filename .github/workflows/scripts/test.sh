@@ -21,13 +21,13 @@ taskId=$(curl --silent --location --request POST ${issues}_search \
 
 
 test=$(yarn test 2>&1 | tail -n +3 | tr -s "\n" " ")
-
+result=${test##*Test Suites:}
 commented=$(curl --location --request POST ${issues}${taskId}/comments \
 --header "$headerAuth" \
 --header "$headerOrgId" \
 --header "$headerContentType" \
 --data-raw '{
-  "text": "'"$test"'"
+  "text": "'"$result"'"
 }')
 
 status=$(echo "$commented" | jq -r '.statusCode')
