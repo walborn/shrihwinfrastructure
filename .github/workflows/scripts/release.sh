@@ -17,12 +17,7 @@ prev=$(git tag | tail -2 | head -n1)
 commits=$(git log $prev..$tag --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" "")
 echo -e "# $tag\n$commits\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
-echo "description": "'"$commits"'"
-echo $prev
-echo $tag
-echo $(git tag | grep '^v\d*.\d*.\d*$')
-echo $(git tag | grep '^v')
-echo $(git tag | tail -3)
+echo $(git log --pretty=format:"%h - %s (%an, %ar)\n" | tr -s "\n" "")
 
 
 # created=$(curl --silent --location --request POST ${issues} \
