@@ -1,3 +1,23 @@
+# v1.0.7
+
+# v1.0.7
+
+# v1.0.7
+
+# v1.0.7
+
+# v1.0.7
+
+# v1.0.7
+
+# v1.0.7
+4efffa3 - v1.0.7 (walborn, 23 minutes ago)
+ d82d90b - void: added tags comments (walborn, 24 minutes ago)
+
+# v1.0
+
+# v1.0.7
+
 # v1.0.4
 763eb8e - v1.0.4 release (walborn, 6 hours ago)
  a7e913b - fix: change queue in yandex tracker (walborn, 6 hours ago)
