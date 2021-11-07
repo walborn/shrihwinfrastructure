@@ -47,3 +47,27 @@ yc container registry create --name my-registry
 ```
 см. https://nikolaymatrosov.medium.com/github-action-%D0%B4%D0%BB%D1%8F-%D0%BF%D1%83%D1%88%D0%B0-%D0%B2-yandex-cloud-container-registry-cbe91d8b0198
 
+
+# Запуск на виртуальной машине
+https://cloud.yandex.ru/docs/container-registry/solutions/run-docker-on-vm
+1. Добавляем сервисному аккаунту роль container-registry.images.puller
+  - я добавил все роли своему аккаунту codebor@yandex.ru
+2. Создаем виртуальную машину
+  - я создал ubuntu
+3. Зашел на свою ВМ
+```bash
+echo <oauth-токен> | docker login --username oauth --password-stdin cr.yandex
+ssh codebor@51.250.4.110
+```
+4. Поставил там докер `sudo apt install docker.io`
+5. Выполнил команду
+```bash
+curl -H Metadata-Flavor:Google 169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token | cut -f1 -d',' | cut -f2 -d':' | tr -d '"' | sudo docker login --username iam --password-stdin cr.yandex
+```
+6. Закачал и установил свой контейнер из облака
+```bash
+sudo docker pull cr.yandex/crp8ambq9gr5dlh9u0sd/shrihwinfrastructure:17985340de0cb95f70dbfc9397cec6d08aa0323fc
+sudo docker run -d -p 80:3000 cr.yandex/crp8ambq9gr5dlh9u0sd/shrihwinfrastructure:17985340de0cb95f70dbfc9397cec6d08aa0323fc
+```
+7. Теперь можно зайти в приложение так http://51.250.4.110/
+  
