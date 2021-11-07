@@ -20,21 +20,21 @@ taskId=$(curl --silent --location --request POST ${issues}_search \
     }' | jq -r '.[0].key')
 
 
-validation=$(yarn test 2>&1 | tail -n +3 | tr -s "\n" " ")
+test=$(yarn test 2>&1 | tail -n +3 | tr -s "\n" " ")
 
-comment="Tests:\n $validation"
 commented=$(curl --location --request POST ${issues}${taskId}/comments \
 --header "$headerAuth" \
 --header "$headerOrgId" \
 --header "$headerContentType" \
 --data-raw '{
-  "text": "'"$comment"'"
+  "text": "'"$test"'"
 }')
 
 status=$(echo "$commented" | jq -r '.statusCode')
 
-if [ $status = 201 ]; then
-  echo "Added comment: TEST RESULT"
-elif [ $status = 404 ]; then
-  echo "Cannot add comment, task is not found"
-fi
+echo $commented
+# if [ $status = 201 ]; then
+#   echo "Added comment: TEST RESULT"
+# elif [ $status = 404 ]; then
+#   echo "Cannot add comment, task is not found"
+# fi
