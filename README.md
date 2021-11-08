@@ -11,7 +11,7 @@ https://tracker.yandex.ru/TMP/order:updated:false/filter?resolution=empty()&auth
   ```bash
   OAuth=$(grep OAuth .env.local | cut -d '=' -f2)
   OrgId=$(grep OrgId .env.local | cut -d '=' -f2)
-  ```
+  ``` 
  
 ## Docker
 You can build your container with 
